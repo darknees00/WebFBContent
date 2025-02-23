@@ -1,0 +1,148 @@
+{
+    "inventory": [
+        {
+            "id": 1,
+            "location": "A-1",
+            "productNumber": "P-1001",
+            "changeCount": 10,
+            "supplier": "Supplier 1",
+            "stock": 200,
+            "shelf": "Shelf 1"
+        },
+        {
+            "id": 2,
+            "location": "A-2",
+            "productNumber": "P-1002",
+            "changeCount": 5,
+            "supplier": "Supplier 2",
+            "stock": 150,
+            "shelf": "Shelf 2"
+        },
+        {
+            "id": 3,
+            "location": "A-3",
+            "productNumber": "P-1003",
+            "changeCount": 7,
+            "supplier": "Supplier 3",
+            "stock": 300,
+            "shelf": "Shelf 3"
+        },
+        {
+            "id": 4,
+            "location": "A-4",
+            "productNumber": "P-1004",
+            "changeCount": 12,
+            "supplier": "Supplier 1",
+            "stock": 250,
+            "shelf": "Shelf 1"
+        },
+        {
+            "id": 5,
+            "location": "A-5",
+            "productNumber": "P-1005",
+            "changeCount": 8,
+            "supplier": "Supplier 2",
+            "stock": 180,
+            "shelf": "Shelf 2"
+        },
+        {
+            "id": 6,
+            "location": "A-1",
+            "productNumber": "P-1006",
+            "changeCount": 14,
+            "supplier": "Supplier 3",
+            "stock": 200,
+            "shelf": "Shelf 1"
+        },
+        {
+            "id": 7,
+            "location": "A-2",
+            "productNumber": "P-1007",
+            "changeCount": 11,
+            "supplier": "Supplier 1",
+            "stock": 180,
+            "shelf": "Shelf 2"
+        },
+        {
+            "id": 25,
+            "location": "A-3",
+            "productNumber": "P-1025",
+            "changeCount": 18,
+            "supplier": "Supplier 2",
+            "stock": 300,
+            "shelf": "Shelf 3"
+        },
+        {
+            "id": 1,
+            "location": "A-1",
+            "productNumber": "P-1001",
+            "changeCount": 10,
+            "supplier": "Supplier 1",
+            "stock": 200,
+            "shelf": "Shelf 1"
+        },
+        {
+            "id": 2,
+            "location": "A-2",
+            "productNumber": "P-1002",
+            "changeCount": 5,
+            "supplier": "Supplier 2",
+            "stock": 150,
+            "shelf": "Shelf 2"
+        },
+        {
+            "id": 3,
+            "location": "A-3",
+            "productNumber": "P-1003",
+            "changeCount": 7,
+            "supplier": "Supplier 3",
+            "stock": 300,
+            "shelf": "Shelf 3"
+        },
+        {
+            "id": 4,
+            "location": "A-4",
+            "productNumber": "P-1004",
+            "changeCount": 12,
+            "supplier": "Supplier 1",
+            "stock": 250,
+            "shelf": "Shelf 1"
+        },
+        {
+            "id": 5,
+            "location": "A-5",
+            "productNumber": "P-1005",
+            "changeCount": 8,
+            "supplier": "Supplier 2",
+            "stock": 180,
+            "shelf": "Shelf 2"
+        },
+        {
+            "id": 6,
+            "location": "A-1",
+            "productNumber": "P-1006",
+            "changeCount": 14,
+            "supplier": "Supplier 3",
+            "stock": 200,
+            "shelf": "Shelf 1"
+        },
+        {
+            "id": 7,
+            "location": "A-2",
+            "productNumber": "P-1007",
+            "changeCount": 11,
+            "supplier": "Supplier 1",
+            "stock": 180,
+            "shelf": "Shelf 2"
+        },
+        {
+            "id": 25,
+            "location": "A-3",
+            "productNumber": "P-1025",
+            "changeCount": 18,
+            "supplier": "Supplier 2",
+            "stock": 300,
+            "shelf": "Shelf 3"
+        }
+    ]
+}
