@@ -61,6 +61,23 @@ EMAIL_SENDER = os.getenv("EMAIL_SENDER")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 # API Endpoints
+@app.route('/api/keywords', methods=['GET'])
+def get_keywords():
+    try:
+        conn = connection_pool.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT keyword FROM keywords")
+        keywords = [row[0] for row in cursor.fetchall()]
+        
+        return jsonify({"keywords": keywords}), 200
+    except Exception as e:
+        log(f"Error in get_keywords: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/api/keywords', methods=['POST'])
 def handle_keywords():
     try:
@@ -93,6 +110,46 @@ def handle_keywords():
 
     except Exception as e:
         log(f"Error in handle_keywords: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route('/api/keywords', methods=['DELETE'])
+def delete_keyword():
+    try:
+        keyword = request.json.get('keyword')
+        if not keyword:
+            return jsonify({"error": "No keyword provided"}), 400
+        
+        conn = connection_pool.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM keywords WHERE keyword = %s", (keyword,))
+        deleted_count = cursor.rowcount
+        conn.commit()
+        
+        return jsonify({"message": "Keyword deleted", "deleted_count": deleted_count}), 200
+    except Exception as e:
+        log(f"Error in delete_keyword: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/emails', methods=['GET'])
+def get_emails():
+    try:
+        conn = connection_pool.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT email FROM emails")
+        emails = [row[0] for row in cursor.fetchall()]
+        
+        return jsonify({"emails": emails}), 200
+    except Exception as e:
+        log(f"Error in get_emails: {str(e)}")
         return jsonify({"error": str(e)}), 500
     finally:
         cursor.close()
@@ -140,6 +197,28 @@ def handle_emails():
         cursor.close()
         conn.close()
 
+@app.route('/api/emails', methods=['DELETE'])
+def delete_email():
+    try:
+        email = request.json.get('email')
+        if not email:
+            return jsonify({"error": "No email provided"}), 400
+        
+        conn = connection_pool.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM emails WHERE email = %s", (email,))
+        deleted_count = cursor.rowcount
+        conn.commit()
+        
+        return jsonify({"message": "Email deleted", "deleted_count": deleted_count}), 200
+    except Exception as e:
+        log(f"Error in delete_email: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 def check_keywords(content, keywords):
     if content:
         content_lower = content.lower()
@@ -159,7 +238,7 @@ def check_keywords(content, keywords):
 
     return None
 
-def handle_matched_post(post_id, content, matched_keyword, _cursor):
+def handle_matched_post(post_id, content, matched_keyword, cursor):
     try:
         conn = connection_pool.get_connection()
         cursor = conn.cursor()
@@ -182,28 +261,33 @@ def send_email_notification(post_id, content, matched_keyword):
     try:
         conn = connection_pool.get_connection()
         cursor = conn.cursor()
-        
-        cursor.execute("SELECT email FROM emails")
-        receivers = [row[0] for row in cursor.fetchall()]
 
         cursor.execute("SELECT sent_email FROM matched_posts WHERE post_id = %s", (post_id,))
         result = cursor.fetchone()
+
+        # Nếu email đã được gửi trước đó, bỏ qua
         if result and result[0]:
-            log(f"Email already sent for post {post_id}, skipping notification")
+            log(f"📧 Email already sent for post {post_id}, skipping notification")
             return
-        
+
+        cursor.execute("SELECT email FROM emails")
+        receivers = [row[0] for row in cursor.fetchall()]
         if not receivers:
             log("⚠️ No emails found in the database for sending notifications")
             return
+
+        # Đánh dấu đã gửi email trước khi gửi thực tế (giúp tránh trùng lặp nếu có nhiều process chạy song song)
+        cursor.execute("UPDATE matched_posts SET sent_email = TRUE WHERE post_id = %s", (post_id,))
+        conn.commit()
 
         log(f"📧 Sending email notification to {len(receivers)} recipients")
 
         msg = MIMEText(
             f"""
-            📌 Post ID: {post_id}\n📝 Content: \n{content}\n🔗 Link: https://www.facebook.com/{post_id}, "plain", "utf-8"
+            📌 Post ID: {post_id}\n📝 Content: \n{content}\n🔗 Link: https://www.facebook.com/{post_id}
             """,
         )
-        
+
         msg['Subject'] = f'🚨 New Post Notification - {matched_keyword}'
         msg['From'] = EMAIL_SENDER
         msg['To'] = ", ".join(receivers)
@@ -214,9 +298,6 @@ def send_email_notification(post_id, content, matched_keyword):
             server.sendmail(EMAIL_SENDER, receivers, msg.as_string())
             log("✅ Email sent successfully")
 
-            cursor.execute("UPDATE matched_posts SET sent_email = TRUE WHERE post_id = %s", (post_id,))
-            conn.commit()
-            
     except smtplib.SMTPAuthenticationError:
         log("🔐 SMTP Authentication Error: Invalid email credentials")
     except smtplib.SMTPException as e:
@@ -226,32 +307,6 @@ def send_email_notification(post_id, content, matched_keyword):
     finally:
         cursor.close()
         conn.close()
-
-# Facebook processing functions
-def fetch_facebook_posts():
-    try:
-        log(f"🔎 Start scanning posts from Facebook Groups {FB_GROUP_ID}")
-        
-        url = f"https://graph.facebook.com/v22.0/{FB_GROUP_ID}/feed"
-        params = {
-            'access_token': FB_ACCESS_TOKEN,
-            'limit': 10,
-            #'fields': 'id,message,created_time'
-        }
-
-        response = requests.get(url, params=params)
-        log(f"📡 Facebook API Response Status: {response.status_code}")
-        
-        if response.status_code == 200:
-            data = response.json()
-            posts = data.get('data', [])
-            log(f"📥 Received {len(posts)} posts")
-            process_posts(posts)
-        else:
-            log(f"❌ Facebook API error: {response.text}")
-
-    except Exception as e:
-        log(f"🔥 Critical error in fetch_facebook_posts: {str(e)}")
 
 def process_posts(posts):
     try:
@@ -295,6 +350,34 @@ def process_posts(posts):
     finally:
         cursor.close()
         conn.close()
+
+# Facebook processing functions
+def fetch_facebook_posts():
+    try:
+        log(f"🔎 Start scanning posts from Facebook Groups {FB_GROUP_ID}")
+        
+        url = f"https://graph.facebook.com/v22.0/{FB_GROUP_ID}/feed"
+        params = {
+            'access_token': FB_ACCESS_TOKEN,
+            'limit': 10,
+            #'fields': 'id,message,created_time'
+        }
+
+        response = requests.get(url, params=params)
+        log(f"📡 Facebook API Response Status: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            posts = data.get('data', [])
+            log(f"📥 Received {len(posts)} posts")
+            process_posts(posts)
+        else:
+            log(f"❌ Facebook API error: {response.text}")
+
+    except Exception as e:
+        log(f"🔥 Critical error in fetch_facebook_posts: {str(e)}")
+
+
 # Initial fetch for testing; you can remove this if you rely solely on the scheduler.
 fetch_facebook_posts()
 
