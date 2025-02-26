@@ -392,4 +392,4 @@ if __name__ == '__main__':
     scheduler_thread = Thread(target=run_scheduler)
     scheduler_thread.daemon = True
     scheduler_thread.start()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=8084, debug=True)
