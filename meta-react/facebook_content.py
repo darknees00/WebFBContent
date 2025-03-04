@@ -33,10 +33,10 @@ def get_logs():
 
 # Database configuration
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", "123456"),
-    "database": os.getenv("DB_NAME", "facebook_db"),
+    "host": os.getenv("DB_HOST", "52.184.83.97"),
+    "user": os.getenv("DB_USER", "nhoma"),
+    "password": os.getenv("DB_PASSWORD", "123"),
+    "database": os.getenv("DB_NAME", "warehouse_management"),
     "charset": "utf8mb4"
 }
 
