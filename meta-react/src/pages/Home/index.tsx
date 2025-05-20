@@ -15,7 +15,7 @@ const HomePage = () => {
   // Lấy logs từ API
   const fetchLogs = async () => {
     try {
-      const response = await fetch("http://52.184.83.97:8085/api/logs");
+      const response = await fetch("http://127.0.0.1:8085/api/logs");
       const data = await response.json();
       setLogs(data.logs);
     } catch (error) {
@@ -26,7 +26,7 @@ const HomePage = () => {
   // Lấy danh sách keyword từ API
   const fetchDbKeywords = async () => {
     try {
-      const response = await fetch("http://52.184.83.97:8085/api/keywords");
+      const response = await fetch("http://127.0.0.1:8085/api/keywords");
       const data = await response.json();
       if (data.keywords && Array.isArray(data.keywords)) {
         setKeywords(data.keywords);
@@ -39,7 +39,7 @@ const HomePage = () => {
   // Lấy danh sách email từ API
   const fetchDbEmails = async () => {
     try {
-      const response = await fetch("http://52.184.83.97:8085/api/emails");
+      const response = await fetch("http://127.0.0.1:8085/api/emails");
       const data = await response.json();
       if (data.emails && Array.isArray(data.emails)) {
         setEmails(data.emails);
@@ -109,7 +109,7 @@ const HomePage = () => {
 
       if (finalKeywords.length > 0) {
         requests.push(
-          fetch("http://52.184.83.97:8085/api/keywords", {
+          fetch("http://127.0.0.1:8085/api/keywords", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ keywords: finalKeywords }),
@@ -119,7 +119,7 @@ const HomePage = () => {
 
       if (finalEmails.length > 0) {
         requests.push(
-          fetch("http://52.184.83.97:8085/api/emails", {
+          fetch("http://127.0.0.1:8085/api/emails", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ emails: finalEmails }),
@@ -172,7 +172,7 @@ const HomePage = () => {
     );
     if (confirmed) {
       try {
-        const response = await fetch("http://52.184.83.97:8085/api/keywords", {
+        const response = await fetch("http://127.0.0.1:8085/api/keywords", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ keyword: keywordToDelete }),
@@ -202,7 +202,7 @@ const HomePage = () => {
     );
     if (confirmed) {
       try {
-        const response = await fetch("http://52.184.83.97:8085/api/emails", {
+        const response = await fetch("http://127.0.0.1:8085/api/emails", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: emailToDelete }),
